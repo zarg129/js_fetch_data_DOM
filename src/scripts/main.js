@@ -33,34 +33,14 @@ getlist
     console.warn(error);
   });
 
-const getPhonesDetails = (id) => {
-  const resolver = (resolve, reject) => {
-    resolve(request(`/phones/${id}.json`));
+getlist
+  .then(list =>
+    Promise.all(list.map(phone => {
+      const phoneWithDetails = new Promise((resolve) => {
+        resolve(request(`/phones/${phone.id}.json`));
+      });
 
-    reject(new Error('No such id'));
-  };
-
-  return new Promise(resolver);
-};
-
-const getPhoneId = getPhonesDetails('motorola-atrix-4g');
-
-getPhoneId
-  .then(
-    result => console.log(result)
-  )
-  .catch(
-    error => console.log(error)
-  );
-
-const phonesWithDetails = getPhones();
-
-phonesWithDetails
-  .then(
-    list => Promise.all(
-      list.map(phoneInfo => {
-        // ????
-      }
-      )
-    )
-  );
+      return phoneWithDetails
+        .then(detail => Object.assign(phone, detail));
+    })))
+  .then(res => console.log(res));
